@@ -1,32 +1,29 @@
-import asyncio  #Импортируем библиотеку asyncio, чтобы иметь возможность
-# добавить асинхронную функцию main в цикл событий.
+
+import asyncio
 
 from aiogram import Bot, Dispatcher
 from config_data.config import Config, load_config
+from handlers import other_handlers, user_handlers
 
 
 # Функция конфигурирования и запуска бота
-async def main() -> None:  #асинхронная функция main, в которой мы сначала
-    # создаем объект config - экземпляр класса Config, через который можно получить доступ к токену бота.
+async def main():
 
     # Загружаем конфиг в переменную config
-    config: Config = load_config('/home/gotcrab/PycharmProjects/modular_echo_bot/.env')
+    config: Config = load_config()
 
     # Инициализируем бот и диспетчер
     bot: Bot = Bot(token=config.tg_bot.token)
     dp: Dispatcher = Dispatcher()
 
+    # Регистриуем роутеры в диспетчере
+    dp.include_router(user_handlers.router)
+    dp.include_router(other_handlers.router)
+
     # Пропускаем накопившиеся апдейты и запускаем polling
-    await bot.delete_webhook(drop_pending_updates=True)  #пропускаем, накопившиеся за время отсутствия бота в сети,
-    # апдейты и запускаем поллинг.
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
-# Т.к. функция main асинхронная, мы не можем ее просто вызвать, как привыкли это делать с синхронными функциями,
-# но зато мы можем запустить цикл событий и добавить функцию в него
+
 if __name__ == '__main__':
     asyncio.run(main())
-
-    #В принципе, уже на этом этапе можно запустить этот модуль на исполнение и бот будет работать.
-    # Запустите, проверьте сами. Правда, бот ни на что не будет реагировать, но и ошибок терминал не выдаст.
-    # Это говорит о том, что бот сконфигурирован правильно и цикл получения апдейтов запущен.
-    # И нам всего лишь осталось добавить хэндлеры
