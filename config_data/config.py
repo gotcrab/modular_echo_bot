@@ -9,7 +9,7 @@ class TgBot:
 class Config:
     tg_bot: TgBot
 
-def load_config(path: str | None) -> Config:
+def load_config(path: str | None='/home/gotcrab/PycharmProjects/modular_echo_bot/.env') -> Config:
     env: Env = Env()
     env.read_env(path)
 
